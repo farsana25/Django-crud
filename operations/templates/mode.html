@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 110%;
+            max-width: 1200px;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .box,
+        .del {
+            background-color: #fff;
+            height: auto;
+            width: 80%;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .box:hover,
+        .del:hover {
+            transform: translateY(-5px);
+        }
+
+        h3 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        select {
+            height: 45px;
+            border-radius: 4px;
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            margin-bottom: 18px;
+            outline: none;
+            border: 1px solid #ddd;
+            transition: border 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border: 1px solid #0056b3;
+        }
+
+        button {
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #28a745;
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            outline: none;
+            color: white;
+            font-size: 16px;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f7f7f7;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .msg {
+            text-align: center;
+            margin-top: 15px;
+            color: #28a745;
+        }
+
+        .btn {
+            color: #007bff;
+            text-decoration: none;
+            border: 1px solid #007bff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn-delete {
+            color: #000000;
+            /* Text color */
+            border-color: #000000;
+            /* Border color */
+            background-color: transparent;
+            /* Remove green background */
+        }
+
+      
+        .btn-delete:hover {
+            background-color: transparent;
+            color: #000000;
+            border-color: #000000;
+        }
+
+
+
+
+        .btn-edit {
+            color: #000000;
+            border-color: #000000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Add Student Form -->
+        <div class="box">
+            <form method="POST" action="{% url 'add_student' %}">
+                {% csrf_token %}
+                <h3>Add New Student</h3>
+                <input type="text" name="name" placeholder="Enter the Student Name" required><br>
+                <input type="email" name="email" placeholder="Enter the Student Email" required><br>
+                <input type="number" name="age" placeholder="Enter the Age" required><br>
+                <select id="gender" name="gender" required>
+                    <option value="" selected disabled>Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select><br>
+                <button type="submit">Submit</button>
+            </form>
+
+            {% if msg %}
+            <p class="msg">{{ msg }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Display Student List -->
+        <div class="del">
+            <h3>Registered Students</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Student</th>
+                        <th>Email</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.id }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>{{ student.age }}</td>
+                        <td>{{ student.gender }}</td>
+                        <td>
+                            <a href="/update/{{ student.id }}" class="btn btn-edit">Edit</a>
+                        </td>
+                        <td>
+                            <form method="POST" action="{% url 'delete_student' student.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-delete">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">No records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
